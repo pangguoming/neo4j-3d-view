@@ -11,7 +11,7 @@ class App extends Component {
 
     initNeo4j(){
       var driver = NEO4J.driver(
-        'neo4j://localhost',
+        'bolt://localhost:7687',
         NEO4J.auth.basic('neo4j', 'pgmopen')
       );
       var session = driver.session({ defaultAccessMode: NEO4J.session.READ });
