@@ -1,0 +1,110 @@
+#cypher-frame {
+  width: 100%;
+  margin: 0;
+  background-color: #DDD;
+  position: relative;
+}
+h1 {
+  margin: 0;
+  padding: .5em;
+}
+#console {
+  width: 100%;
+  vertical-align: top;
+}
+#runButton {
+  width: 100%;
+  height: 100%;
+  border-width: 0;
+  margin: 0;
+  font: bold 16px "Courier New";
+  cursor: pointer;
+  background-color: #008CC2;
+  color: #FFF;
+}
+body {
+  font: 15px "Courier New";
+  background-color: #CCC;
+  margin: 0;
+  overflow-y: scroll;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+td {
+  position: relative;
+  padding: 0;
+}
+#results table {
+  width: auto;
+  background-color: #EEE;
+  font-size: 13px;
+}
+#results th {
+  border-right: 1px solid #DDD;
+  border-bottom: 1px solid #DDD;
+  padding: 3px 5px;
+  background-color: #999;
+  color: #FFF;
+}
+#results td {
+  border-right: 1px solid #BBB;
+  border-bottom: 1px solid #BBB;
+  padding: 3px 5px;
+  vertical-align: top;
+}
+form {
+  position: relative;
+}
+textarea {
+  border-width: 0;
+  font: 15px "Courier New";
+  margin: 0;
+  width: 100%;
+  resize: vertical;
+  min-height: 36px;
+  height: 72px;
+  padding: 0;
+  background-color: transparent;
+  vertical-align: top;
+}
+#parameters {
+  font: 13px "Courier New";
+}
+#parameters td {
+}
+#parameters input[type=text] {
+  border-width: 0;
+  background-color: transparent;
+  color: #FFF;
+  font: 13px "Courier New";
+  padding: 0;
+  margin: 0;
+}
+#parameters input[type=button] {
+  font: 13px "Courier New";
+  padding: 0 2px;
+}
+
+
+.links line {
+stroke: #999;
+stroke-opacity: 0.6;
+}
+.nodes circle {
+stroke: #fff;
+stroke-width: 1.5px;
+}
+
+.td1{
+  width:75%;padding:2px 2px 2px 4px;background-color:#FFF;vertical-align:top
+}
+
+.td2{
+  width:25%;vertical-align:top;background-color:#0F5788;color:#FFF
+}
+
+.td3{
+  width:25%;height:40px;vertical-align:bottom;background-color:#0F5788
+}
