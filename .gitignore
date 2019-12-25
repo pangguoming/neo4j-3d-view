@@ -5,6 +5,7 @@
 *.err
  
 # temp file for git conflict merging
+package-lock.json
 *.orig
 *.log
 *.rej
