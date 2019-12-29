@@ -1,13 +1,16 @@
+#canvas-frame{
+  position: absolute;
+  top:0;
+}
 #cypher-frame {
   width: 100%;
   margin: 0;
   background-color: #DDD;
-  position: relative;
+  position: absolute;
+  top:0;
+  z-index: 1000;
 }
-h1 {
-  margin: 0;
-  padding: .5em;
-}
+
 #console {
   width: 100%;
   vertical-align: top;
@@ -17,7 +20,6 @@ h1 {
   height: 100%;
   border-width: 0;
   margin: 0;
-  font: bold 16px "Courier New";
   cursor: pointer;
   background-color: #008CC2;
   color: #FFF;
@@ -54,9 +56,6 @@ td {
   padding: 3px 5px;
   vertical-align: top;
 }
-form {
-  position: relative;
-}
 textarea {
   border-width: 0;
   font: 15px "Courier New";
@@ -64,37 +63,9 @@ textarea {
   width: 100%;
   resize: vertical;
   min-height: 36px;
-  height: 72px;
   padding: 0;
   background-color: transparent;
   vertical-align: top;
-}
-#parameters {
-  font: 13px "Courier New";
-}
-#parameters td {
-}
-#parameters input[type=text] {
-  border-width: 0;
-  background-color: transparent;
-  color: #FFF;
-  font: 13px "Courier New";
-  padding: 0;
-  margin: 0;
-}
-#parameters input[type=button] {
-  font: 13px "Courier New";
-  padding: 0 2px;
-}
-
-
-.links line {
-stroke: #999;
-stroke-opacity: 0.6;
-}
-.nodes circle {
-stroke: #fff;
-stroke-width: 1.5px;
 }
 
 .td1{
