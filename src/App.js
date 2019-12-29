@@ -8,29 +8,69 @@ const clock = new THREE.Clock();
 class App extends Component {
     constructor(props) {
         super(props);
-        this.state = { neo4j:{sedriverssion:null,bolt:'bolt://localhost:7687',username:'neo4j',password: 'pgmopen',cypher: 'MATCH (n) RETURN n LIMIT 10'},
-                       webgl:{scene:null,}};
+        this.state = { neo4j:{driver:null,bolt:'bolt://localhost:7687',username:'neo4j',password: 'pgmopen',cypher: 'MATCH (n)-[r]-() RETURN n,r LIMIT 50'},
+                       webgl:{scene:null},
+                       result:{nodes:[],rels:[]}
+                      };
     }
 
     initNeo4j(){
+      if(!this.state.neo4j.driver){
       var driver = NEO4J.driver(
         this.state.neo4j.bolt,
         NEO4J.auth.basic(this.state.neo4j.username, this.state.neo4j.password)
       );       
       this.state.neo4j.driver=driver;
+      }
     }
     runCypher(){
+      if(!this.state.neo4j.driver){
+        alert("请先连接Neo4j")
+        return false;
+      }
+      var that=this;
       var session = this.state.neo4j.driver.session({ defaultAccessMode: NEO4J.session.READ });     
       session .run(this.state.neo4j.cypher , {})
       .subscribe({
         onKeys: keys => {
           //console.log(keys)
         }, 
-        onNext: record => {
-          console.log(record)
-          this.initObject() ;
+        onNext: record => {     
+          record.forEach( function( value ) {  
+              if(value.start&&value.end){//关系
+                var item={rel:value,mesh:null}
+                that.setState({
+                  result:{ ...that.state.result,rels : [...that.state.result.rels, item]}
+                })
+              }else{//节点
+                // var hasNode = that.state.result.nodes.find(item=>item.node.identity=value.identity)
+                // if(!hasNode){
+                  var mesh=that.initMesh() ;
+                  var item={node:value,mesh:mesh}
+                  that.setState({
+                    result:{ ...that.state.result,nodes : [...that.state.result.nodes, item]}
+                  })  
+                //}              
+              }
+              console.log(that.state.result)
+          });
+          
         },
         onCompleted: () => {
+          //创建关系在3D中的连线
+              that.state.result.rels.forEach( function( rel ) {  
+                //找到起始节点
+                var startNode=that.state.result.nodes.find(item=>item.node.identity.low==rel.rel.start.low);
+                //找到终止节点
+                var endNode=that.state.result.nodes.find(item=>item.node.identity.low==rel.rel.end.low);
+                //创建3D连线
+                if(startNode&&endNode){
+                var line=that.initLine(startNode.mesh.position,endNode.mesh.position)
+                //保存进state.result.rels
+
+                }
+
+              });
           session.close() // returns a Promise
         },
         onError: error => {
@@ -86,21 +126,21 @@ class App extends Component {
             scene.add( hemiLight );
         }
  
-        function initObject() { 
-            var geometry = new THREE.SphereGeometry( 5, 32, 32 );
-            var material = new THREE.MeshPhongMaterial( { color: 0x4080ff, dithering: true } );
-            var mesh = new THREE.Mesh(geometry, material);
-            mesh.position.set(0, 0, 0);
-            scene.add(mesh);
+        // function initObject() { 
+        //     var geometry = new THREE.SphereGeometry( 5, 32, 32 );
+        //     var material = new THREE.MeshPhongMaterial( { color: 0x4080ff, dithering: true } );
+        //     var mesh = new THREE.Mesh(geometry, material);
+        //     mesh.position.set(0, 0, 0);
+        //     scene.add(mesh);
 
 
-            var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
-            var geometry = new THREE.Geometry();
-            geometry.vertices.push(new THREE.Vector3( -10, 0, 0) );
-            geometry.vertices.push(new THREE.Vector3( 0, 10, 0) );
-            var line = new THREE.Line( geometry, material );
-            scene.add( line );
-        }   
+        //     var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+        //     var geometry = new THREE.Geometry();
+        //     geometry.vertices.push(new THREE.Vector3( -10, 0, 0) );
+        //     geometry.vertices.push(new THREE.Vector3( 0, 10, 0) );
+        //     var line = new THREE.Line( geometry, material );
+        //     scene.add( line );
+        // }   
 
         function initEnviorment(){
           // GROUND
@@ -138,17 +178,11 @@ class App extends Component {
         /* 控制器 */
         var controls;
         function initControls() {
-          /* 飞行控件 */
-          // controls = new new THREE.FirstPersonControl(camera, renderer.domElement);
-          // /* 属性参数默认 */
-          // controls.rollSpeed = Math.PI / 24; // 翻滚速度
-          // controls.autoForward = true; //自动向前移动
-          // controls.dragToLook = false;
-          // controls.movementSpeed = 25; //移动速度
           /* 第一人称控件 */
-          controls = new FirstPersonControls(camera);
+          controls = new FirstPersonControls(camera, renderer.domElement);
           controls.movementSpeed = 100;
           controls.lookSpeed = 0.08;
+          controls.mouseDragOn =false;
       }
  
         function threeStart() {
@@ -157,7 +191,7 @@ class App extends Component {
             initScene();
             initLight();
             initControls();
-            initObject();
+            //initObject();
             initEnviorment();
             animation();
  
@@ -170,42 +204,46 @@ class App extends Component {
         }
     }
  
-    initObject() { 
-      var x=Math.ceil(Math.random()*50);
-      var y=Math.ceil(Math.random()*50);
-      var z=Math.ceil(Math.random()*50);
+    initLine(start,end){
+      var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+      var geometry = new THREE.Geometry();
+      geometry.vertices.push(start );
+      geometry.vertices.push(end );
+      var line = new THREE.Line( geometry, material );
+      this.state.webgl.scene.add( line );
+      return line;
+    }
+    initMesh() { 
+
+      var x=Math.ceil(Math.random()*100);
+      var y=Math.ceil(Math.random()*100);
+      var z=Math.ceil(Math.random()*100);
       var geometry = new THREE.SphereGeometry( 5, 32, 32 );
       var material = new THREE.MeshPhongMaterial( { color: 0x4080ff, dithering: true } );
       var mesh = new THREE.Mesh(geometry, material);
       mesh.position.set(x, y, z);
       this.state.webgl.scene.add(mesh);
-
-      var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
-      var geometry = new THREE.Geometry();
-      geometry.vertices.push(new THREE.Vector3( x, y, z) );
-      geometry.vertices.push(new THREE.Vector3( z, y, x) );
-      var line = new THREE.Line( geometry, material );
-      this.state.webgl.scene.add( line );
+      return mesh;      
   }   
 
     handleBoltChange(e){
       this.setState({
-        neo4j:{bolt : e.target.value}
+        neo4j:{...this.state.neo4j,bolt : e.target.value}
       })
     }
     handleUserNameChange(e){
       this.setState({
-        neo4j:{ username : e.target.value}
+        neo4j:{...this.state.neo4j, username : e.target.value}
       })
     }
     handlePasswordChange(e){
       this.setState({
-        neo4j:{password : e.target.value}
+        neo4j:{...this.state.neo4j,password : e.target.value}
       })
     }
     handleCypherChange(e){
       this.setState({
-        neo4j:{ cypher : e.target.value}
+        neo4j:{ ...this.state.neo4j,cypher : e.target.value}
       })
     }
 
@@ -225,10 +263,10 @@ class App extends Component {
           <div>
             <div id='cypher-frame'>              
               <div >
-                bolt url:<input type='text' id='bolturl' onChange={this.handleBoltChange.bind(this)} value={this.state.neo4j.bolt} />
-                user name: <input type='text' id='username' onChange={this.handleUserNameChange.bind(this)} value={this.state.neo4j.username} />
-                password: <input type='text' id='password'  onChange={this.handlePasswordChange.bind(this)} value={this.state.neo4j.password} />
-                <input id='connectserver' type='button' value='Connect' onClick={this.handleConnect.bind(this)} />
+                bolt url:<input type='text'  onChange={this.handleBoltChange.bind(this)} value={this.state.neo4j.bolt} />
+                user name: <input type='text'  onChange={this.handleUserNameChange.bind(this)} value={this.state.neo4j.username} />
+                password: <input type='text'   onChange={this.handlePasswordChange.bind(this)} value={this.state.neo4j.password} />
+                <input  type='button' value='Connect' onClick={this.handleConnect.bind(this)} />
               </div>      
               <table width='100%' border='0' cellSpacing='0' cellPadding='0'><tbody>
                 <tr>
@@ -247,14 +285,13 @@ class App extends Component {
                         </tr>
                         </tbody></table>
                     </form>
-                    <div id='results'></div>
                   </td>
                 </tr>
                 </tbody></table>          
             </div>
 
             <div id='canvas-frame'>  </div>
-          //</div>
+          </div>
         );
     }
 }

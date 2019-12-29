@@ -43,19 +43,7 @@ td {
   background-color: #EEE;
   font-size: 13px;
 }
-#results th {
-  border-right: 1px solid #DDD;
-  border-bottom: 1px solid #DDD;
-  padding: 3px 5px;
-  background-color: #999;
-  color: #FFF;
-}
-#results td {
-  border-right: 1px solid #BBB;
-  border-bottom: 1px solid #BBB;
-  padding: 3px 5px;
-  vertical-align: top;
-}
+
 textarea {
   border-width: 0;
   font: 15px "Courier New";
