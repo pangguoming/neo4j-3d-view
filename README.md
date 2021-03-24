@@ -1,6 +1,6 @@
 # Neo4j 3D视图项目雏形
 ### 视频演示
-![1](https://github.com/pangguoming/neo4j-3d-view/blob/master/assert/m1.gife)
+![1](https://github.com/pangguoming/neo4j-3d-view/blob/master/assert/m1.gif)
 
 ### 图片演示
 ![1](https://github.com/pangguoming/neo4j-3d-view/blob/master/assert/s1.png)
