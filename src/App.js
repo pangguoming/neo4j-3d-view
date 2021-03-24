@@ -74,6 +74,7 @@ class App extends Component {
           session.close() // returns a Promise
         },
         onError: error => {
+          debugger
           alert('连接失败，请检查bolt url 或 Neo4j是否启动')
         }
       })
